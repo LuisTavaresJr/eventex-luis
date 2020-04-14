@@ -1,3 +1,5 @@
+import hashlib
+
 from django.conf import settings
 from django.core import mail
 from django.http import HttpResponseRedirect, Http404
@@ -24,6 +26,8 @@ def create(request):
 
     # Save BD
     subscription = Subscription.objects.create(**form.cleaned_data)
+    subscription.hash_url = hashlib.md5(subscription.email.encode()).hexdigest()
+    subscription.save()
 
     # Send email
     _send_mail(
@@ -33,7 +37,7 @@ def create(request):
         'subscriptions/subscription_email.txt',
         {'subscription': subscription})
 
-    return HttpResponseRedirect(f'/inscricao/{subscription.pk}/')
+    return HttpResponseRedirect(f'/inscricao/{subscription.hash_url}/')
 
 
 def new(request):
@@ -41,9 +45,9 @@ def new(request):
     template_name = 'subscriptions/subscription_form.html'
     return render(request, template_name, context)
 
-def detail(request, pk):
+def detail(request, hash_url):
     try:
-        subscription = Subscription.objects.get(pk=pk)
+        subscription = Subscription.objects.get(hash_url=hash_url)
     except Subscription.DoesNotExist:
         raise Http404
     return render(request, 'subscriptions/subscription_detail.html', {'subscription': subscription})

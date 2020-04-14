@@ -1,4 +1,4 @@
-import unittest
+import hashlib
 
 from django.core import mail
 from django.test import TestCase
@@ -43,13 +43,14 @@ class SubscribeGet(TestCase):
 
 class SubscribePostValid(TestCase):
     def setUp(self):
-        data = dict(name='Luis tavares', cpf='12345678901',
+        self.data = dict(name='Luis tavares', cpf='12345678901',
                     email='luis@tavares.com', phone='21-99618-6180')
-        self.response = self.client.post('/inscricao/', data)
+        self.response = self.client.post('/inscricao/', self.data)
 
     def test_post(self):
-        '''Valid POST should redirect to /inscricao/1/'''
-        self.assertRedirects(self.response, '/inscricao/1/')
+        '''Valid POST should redirect to /inscricao/{hash_obj.hexdigest()}/'''
+        hash_obj = hashlib.md5(self.data['email'].encode())
+        self.assertRedirects(self.response, f'/inscricao/{hash_obj.hexdigest()}/')
 
     def test_send_subscribe_email(self):
         self.assertEqual(1, len(mail.outbox))
