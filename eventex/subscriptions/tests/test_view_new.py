@@ -1,15 +1,14 @@
 import hashlib
-
 from django.core import mail
 from django.test import TestCase
-
 from eventex.subscriptions.forms import SubscriptionForm
 from eventex.subscriptions.models import Subscription
+from django.shortcuts import resolve_url as r
 
 
-class SubscribeGet(TestCase):
+class SubscriptionNewGet(TestCase):
     def setUp(self):
-        self.response = self.client.get('/inscricao/')
+        self.response = self.client.get(r('subscriptions:new'))
     def test_get(self):
         '''Get /inscricao/ must return status code 200'''
         self.assertEqual(200, self.response.status_code)
@@ -41,16 +40,16 @@ class SubscribeGet(TestCase):
 
     
 
-class SubscribePostValid(TestCase):
+class SubscriptionNewPostValid(TestCase):
     def setUp(self):
         self.data = dict(name='Luis tavares', cpf='12345678901',
                     email='luis@tavares.com', phone='21-99618-6180')
-        self.response = self.client.post('/inscricao/', self.data)
+        self.response = self.client.post(r('subscriptions:new'), self.data)
 
     def test_post(self):
         '''Valid POST should redirect to /inscricao/{hash_obj.hexdigest()}/'''
         hash_obj = hashlib.md5(self.data['email'].encode())
-        self.assertRedirects(self.response, f'/inscricao/{hash_obj.hexdigest()}/')
+        self.assertRedirects(self.response, r('subscriptions:detail', hash_obj.hexdigest()))
 
     def test_send_subscribe_email(self):
         self.assertEqual(1, len(mail.outbox))
@@ -58,9 +57,9 @@ class SubscribePostValid(TestCase):
     def test_save_subscription(self):
         self.assertTrue(Subscription.objects.exists())
 
-class SubscribePostInvalid(TestCase):
+class SubscriptionNewPostInvalid(TestCase):
     def setUp(self):
-        self.response = self.client.post('/inscricao/', {})
+        self.response = self.client.post(r('subscriptions:new'), {})
     def test_post(self):
         '''Invalid POST should not redirect'''
         self.assertEqual(200, self.response.status_code)
