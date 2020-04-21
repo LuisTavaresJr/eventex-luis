@@ -31,7 +31,7 @@ def create(request):
 
     # Save BD
     subscription = Subscription.objects.create(**form.cleaned_data)
-    subscription.hash_url = hashlib.md5(subscription.email.encode()).hexdigest()
+    subscription.hash_url = hashlib.md5(subscription.name.encode()).hexdigest()
     subscription.save()
 
     # Send email
