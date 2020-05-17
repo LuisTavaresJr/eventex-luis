@@ -30,7 +30,7 @@ def create(request):
                       {'form': form})
 
     # Save BD
-    subscription = Subscription.objects.create(**form.cleaned_data)
+    subscription = form.save()
     subscription.hash_url = hashlib.md5(subscription.name.encode()).hexdigest()
     subscription.save()
 
