@@ -1,6 +1,9 @@
 from django.db import models
 from django.shortcuts import resolve_url as r
 
+from eventex.core.managers import EmailContactManager
+
+
 class Speaker(models.Model):
     name = models.CharField('nome', max_length=255)
     slug = models.SlugField('slug')
@@ -29,12 +32,16 @@ class Contact(models.Model):
     kind = models.CharField('tipo', max_length=1, choices=KINDS)
     value = models.CharField('valor', max_length=255)
 
+    objects = models.Manager()
+    emails = EmailContactManager()
+
     class Meta:
         verbose_name = 'contato'
         verbose_name_plural = 'contatos'
 
     def __str__(self):
         return self.value
+
 
 
 class Talk(models.Model):
