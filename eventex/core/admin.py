@@ -34,7 +34,6 @@ class SpeakerModelAdmin(admin.ModelAdmin):
     phone.short_description = 'telefone'
 
 
-
 admin.site.register(Speaker, SpeakerModelAdmin)
 admin.site.register(Talk)
 admin.site.register(Course)

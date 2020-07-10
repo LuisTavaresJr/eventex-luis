@@ -12,6 +12,7 @@ def speaker_detail(request, slug):
     speaker = get_object_or_404(Speaker, slug=slug)
     return render(request, template_name, {'speaker': speaker})
 
+
 def talk_list(request):
     context = {
         'morning_talks': Talk.objects.at_morning(),
